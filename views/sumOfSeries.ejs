@@ -1,0 +1,24 @@
+<%- include("_header") -%>
+
+<h2>Calculate sum of a series</h2>
+
+<form action="/sumofseries" method="post">
+  <div class="form-horizontal">
+    <%- include("_editor") -%>
+
+    <div class="form-group row">
+      <label class="col-form-label col-sm-2"></label>
+      <div class="col-sm-10">
+        <input type="submit" value="Calculate Sum" class="btn btn-default btn-primary" />
+      </div>
+    </div>
+  </div>
+</form>
+
+<% if (!!model.error) { %>
+    <h5 style="color: red;"> <%= model.error %> </h5>
+<% } else if (!!model.result) { %>
+    <p>The sum of numbers from <%= model.editor.start %> to <%= model.editor.end %> incremented by <%= model.editor.increment %> is <b><%= model.result %></b></p>
+<% } %>
+
+<%- include("_footer") -%>

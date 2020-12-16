@@ -1,0 +1,68 @@
+<%- include("_header") -%>
+
+<h2>Import Books</h2>
+<h4>Total number of books in the database: <%= model.totalRecords %></h4>
+<h5>Select a file with books for Database insert.</h5>
+
+<form>
+  <div class="form-horizontal">
+    <div class="mb-3">
+      <input class="form-control" name="filename" type="file" id="formFile" required/>
+    </div>
+
+    <div class="form-group row">
+      <label class="col-form-label col-sm-2"></label>
+      <div class="col-sm-10">
+        <input
+          type="submit"
+          value="Import Books"
+          class="btn btn-default btn-primary"
+        />
+      </div>
+    </div>
+  </div>
+</form>
+
+<h3 id="waiting"></h3>
+<div id="result"></div>
+
+
+<script>
+  document.querySelector("form").addEventListener("submit", e => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const waiting = document.getElementById('waiting');
+      waiting.appendChild(document.createTextNode('Wait for results'));
+      fetch("/import", {
+        method: "POST",
+        body: formData
+      })
+        .then(response => response.json())
+        .then(data => {
+          waiting.textContent = '';
+          const result = document.getElementById('result');
+          let html = `
+            <h3>Import Summary</h3>
+            <h5>Initial number of books in database: ${data.initial}</h5>
+            <h5>Books inserted successfully: ${data.succeed}</h5>
+            <h5>Resulting number od books in database: ${data.succeed + data.initial}</h5>
+          `;
+           if (data.errors.length) {
+             html = html + `
+                <h3>Error Summary</h3>
+                <h5>Total book records processed: ${data.processed}</h5>
+                <h5>Number of books not inserted: ${data.failed}</h5>
+            `;
+             data.errors.forEach(err => {
+               html = html + `<p>${err}</p>`
+             });
+           }
+           result.innerHTML = html;
+        })
+        .catch(err => {
+            document.getElementById("message").textContent = `Error: ${err.message}`;
+        });
+    });
+</script>
+
+<%- include("_footer") -%>

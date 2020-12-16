@@ -1,31 +1,23 @@
 <div class="form-group row">
-  <label class="col-form-label col-sm-3" for="carvin">VIN</label>
+  <label class="col-form-label col-sm-3" for="start">Enter Starting Number</label>
   <div class="col-sm-6">
-    <input type="number" class="form-control" name="carvin" value="<%= model.editor.carvin %>" />
+    <input type="number" class="form-control" name="start" value="<%= model.editor.start %>" />
   </div>
-  <div>(equals)</div>
+  <div>(required)</div>
 </div>
 
 <div class="form-group row">
-  <label class="col-form-label col-sm-3" for="carmake">Make</label>
+  <label class="col-form-label col-sm-3" for="end">Enter Ending Number</label>
   <div class="col-sm-6">
-    <input class="form-control" name="carmake" value="<%= model.editor.carmake %>" />
+    <input type="number" class="form-control" name="end" value="<%= model.editor.end %>" />
   </div>
-  <div>(begins with)</div>
+  <div>(required)</div>
 </div>
 
 <div class="form-group row">
-  <label class="col-form-label col-sm-3" for="carmodel">Model</label>
+  <label class="col-form-label col-sm-3" for="increment">Enter Increment</label>
   <div class="col-sm-6">
-    <input class="form-control" name="carmodel" value="<%= model.editor.carmodel %>" />
+    <input type="number" class="form-control" name="increment" value="<%= model.editor.increment %>" />
   </div>
-  <div>(begins with)</div>
-</div>
-
-<div class="form-group row">
-  <label class="col-form-label col-sm-3" for="carmileage">Mileage</label>
-  <div class="col-sm-6">
-    <input class="form-control" name="carmileage" value="<%= model.editor.carmileage %>" />
-  </div>
-  <div>(less than or equal to)</div>
+  <div>(required)</div>
 </div>

@@ -22,55 +22,129 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({ extended: false }));
 
 app.get("/", (req, res) => {
-  const model = {
-    isSearched: false,
-    editor: {
-      carvin: "",
-      carmake: "",
-      carmodel: "",
-      carmileage: "",
-    },
-    cars: [],
-  };
-
-  res.render("index", { model: model });
+  res.render("index");
 });
 
-app.post("/", (req, res) => {
+app.get("/sumofseries", (req, res) => {
+  const model = {
+    editor: {
+      start: "",
+      end: "",
+      increment: "",
+    },
+    result: null,
+    error: null,
+  };
+
+  res.render("sumOfSeries", { model: model });
+});
+
+app.post("/sumofseries", (req, res) => {
   const body = req.body;
 
   const model = {
-    isSearched: true,
     editor: body,
-    cars: [],
+    result: null,
+    error: null,
   };
 
-  let query = `SELECT * FROM car`;
-  const segments = [];
-  Object.keys(req.body).forEach((key) => {
-    if (key === "carvin" && !!req.body[key]) {
-      segments.push(`carvin = ${req.body[key]}`);
-    }
-    if (key === "carmake" && !!req.body[key]) {
-      segments.push(`carmake LIKE '${req.body[key].trim()}%'`);
-    }
-    if (key === "carmodel" && !!req.body[key]) {
-      segments.push(`carmodel LIKE '${req.body[key].trim()}%'`);
-    }
-    if (key === "carmileage" && !!req.body[key]) {
-      segments.push(`carmileage::numeric <= ${req.body[key]}`);
-    }
-  });
-
-  if (segments.length) {
-    query = query + " WHERE " + segments.join(" AND ");
+  if (!body.start || !body.end || !body.increment) {
+    model.error = "Input can not be empty!";
   }
 
-  pool.query(query).then((data) => {
-    model.cars = data.rows;
-    res.render("index", { model: model });
-  });
+  if (Number(body.start) > Number(body.end)) {
+    model.error = "Ending number must be less than starting number.";
+  }
+
+  if (!model.error) {
+    model.result = calculateSum(
+      Number(body.start),
+      Number(body.end),
+      Number(body.increment)
+    );
+  }
+
+  res.render("sumofseries", { model: model });
 });
+
+function calculateSum(start, end, inc) {
+  let sum = 0;
+  for (let i = start; i <= end; i = i + inc) {
+    sum = sum + i;
+  }
+  return sum;
+}
+
+app.get("/import", (req, res) => {
+  const model = {
+    totalRecords: 0,
+  };
+
+  pool
+    .query("SELECT * FROM book")
+    .then((data) => {
+      model.totalRecords = data.rowCount;
+      res.render("import", { model: model });
+    })
+    .catch((err) => console.log(err));
+});
+
+app.post("/import", upload.single("filename"), async (req, res) => {
+  if (!req.file || Object.keys(req.file).length === 0) {
+    message = "Error: Import file not uploaded";
+    return res.send(message);
+  }
+
+  let initialRecords = 0;
+
+  try {
+      const result = await pool.query('SELECT * FROM book');
+      initialRecords = result.rowCount;
+  } catch(error) {
+      console.log(error);
+  }
+
+  const buffer = req.file.buffer;
+  const lines = buffer.toString().split(/\r?\n/);
+  const success = [];
+  const errors = [];
+
+  for (let line of lines) {
+    const book = line.split(",");
+    const sql = `
+			INSERT INTO book
+			(book_id, title, total_pages, rating, isbn, published_date)
+			VALUES (${getValFromFile(book[0])}, '${getValFromFile(
+      book[1]
+    )}', '${getValFromFile(book[2])}', '${getValFromFile(
+      book[3]
+    )}', '${getValFromFile(book[4])}', '${getValFromFile(book[5])}')`;
+
+    try {
+      const result = await pool.query(sql);
+      success.push(`Inserted successfully`);
+    } catch (error) {
+      errors.push(`Book ID: ${book[0]} - ${error.message}`);
+    }
+  }
+
+  pool.query('SELECT * FROM book').then(data => {
+    res.status(200).json({
+      initial: initialRecords,
+      processed: lines.length,
+      succeed: success.length,
+      failed: errors.length,
+      errors: errors,
+    });
+  }).catch(err => console.log(err));
+});
+
+function getValFromFile (val) {
+    if(val === 'Null') {
+        return undefined;
+    }
+    return val;
+}
 
 const port = process.env.PORT || 3000;
 
