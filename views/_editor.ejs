@@ -1,0 +1,31 @@
+<div class="form-group row">
+  <label class="col-form-label col-sm-3" for="carvin">VIN</label>
+  <div class="col-sm-6">
+    <input type="number" class="form-control" name="carvin" value="<%= model.editor.carvin %>" />
+  </div>
+  <div>(equals)</div>
+</div>
+
+<div class="form-group row">
+  <label class="col-form-label col-sm-3" for="carmake">Make</label>
+  <div class="col-sm-6">
+    <input class="form-control" name="carmake" value="<%= model.editor.carmake %>" />
+  </div>
+  <div>(begins with)</div>
+</div>
+
+<div class="form-group row">
+  <label class="col-form-label col-sm-3" for="carmodel">Model</label>
+  <div class="col-sm-6">
+    <input class="form-control" name="carmodel" value="<%= model.editor.carmodel %>" />
+  </div>
+  <div>(begins with)</div>
+</div>
+
+<div class="form-group row">
+  <label class="col-form-label col-sm-3" for="carmileage">Mileage</label>
+  <div class="col-sm-6">
+    <input class="form-control" name="carmileage" value="<%= model.editor.carmileage %>" />
+  </div>
+  <div>(less than or equal to)</div>
+</div>

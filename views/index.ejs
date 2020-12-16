@@ -1,0 +1,46 @@
+<%- include("_header") -%>
+
+<h2>This is final exam</h2>
+
+<form action="/" method="post">
+  <div class="form-horizontal">
+    <%- include("_editor") -%>
+
+    <div class="form-group row">
+      <label class="col-form-label col-sm-2"></label>
+      <div class="col-sm-10">
+        <input type="submit" value="Find" class="btn btn-default btn-primary" />
+        <a class="btn btn-default btn-primary" href="/">Reset</a>
+      </div>
+    </div>
+  </div>
+</form>
+
+<% if (model.cars.length && model.isSearched) { %>
+<div class="table-responsive-sm">
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>VIN</th>
+        <th>Make</th>
+        <th>Model</th>
+        <th>Mileage</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% for (const car of model.cars) { %>
+      <tr>
+        <td><%= car.carvin %></td>
+        <td><%= car.carmake %></td>
+        <td><%= car.carmodel %></td>
+        <td><%= car.carmileage %></td>
+      </tr>
+      <% } %>
+    </tbody>
+  </table>
+</div>
+<% } else if (!model.cars.length && model.isSearched) { %>
+	<h4>No records found!</h4>
+<% } %>
+
+<%- include("_footer") -%>
