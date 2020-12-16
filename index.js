@@ -64,7 +64,7 @@ app.post("/sumofseries", (req, res) => {
     );
   }
 
-  res.render("sumofseries", { model: model });
+  res.render("sumOfSeries", { model: model });
 });
 
 function calculateSum(start, end, inc) {
